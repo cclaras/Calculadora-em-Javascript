@@ -11,9 +11,10 @@ let restart = false;    //restart
 
 buttons.forEach((button) => { 
     button.addEventListener ("click", () =>{   //para cada botao adiciono um evento de click
-    const TextoBotao = button.innerText;      //var para pegar o texto do botao que estou clicando 
-    if(/^[0-9]+$/.test(TextoBotao)){         // verificacao com regex, se o texto que estou clicando for de 0 a 9, ou for virgula ele passa no test, e chama a função addDigit passando como paramentro esse texto do btn 
-        addDigit(TextoBotao);
+    const TextoBotao = button.innerText;     //var para pegar o texto do botao que estou clicando 
+
+    if(/^[0-9,]+$/.test(TextoBotao)){         // verificacao com regex, se o texto que estou clicando for de 0 a 9, ou for virgula ele passa no test, e chama a função addDigit passando como paramentro esse texto do btn 
+        addDigit(TextoBotao)
     }else if(["+","-","x","÷"].includes(TextoBotao)) {    // 1)coloca os op em um array  2)verificar se o btn clicado é um operador atraves do includes() se sim, chama o setOperador()
         setOperador(TextoBotao)     //função que verifica se o btn que cliquei é um operador
     }else if(TextoBotao === "="){   //clico no = e chama o calcular
@@ -36,16 +37,21 @@ function updateResultado(originClear = false){
 }
 
 function addDigit(digit){ //funcao para add o digito ao visor
-    if (addDigit === "," && (currentNumber.includes(",") || !currentNumber)) //ver se já tem uma virgula se tiver ele retorna
+    if (digit === "," && (currentNumber.includes(",") || !currentNumber)) { //ver se já tem uma virgula se tiver ele retorna
     return;
+    }
+
+    if (currentNumber.length >= 10) {
+        alert("Máximo de 10 dígitos atingido!");
+        return;
+    }
 
     if (restart){ 
-        currentNumber = digit;
+        currentNumber = digit 
         restart = false;  //vai ser true apenas quando eu calcular 
     }else{
         currentNumber += digit; //se nao, ele apenas segue concatenando um num no outro (123)...
     }
-
     updateResultado(); //função para atualizar em tela isso
 }
 
@@ -62,7 +68,7 @@ function setOperador(newOpe){ //recebe o op por parametro
 
 
 function calculate(){ //aqui faz o calculo
-    if(operador === null || firstOpe === null) result; //verfica se tem o primeiro num e o operador para poder calcular
+    if(operador === null || firstOpe === null) return; //verfica se tem o primeiro num e o operador para poder calcular
     let secondOpe = parseFloat(currentNumber.replace(",", ".")); //pega o segundo operador que é o num atual e troca a virgula pra ponta pra fzer o calc
     let ValorFinal;  //onde vou guardar o resultado da ope
 
@@ -91,10 +97,11 @@ function calculate(){ //aqui faz o calculo
     //verificação se o resultado tiver +de 5 casas decimais uso tofixed para carregar até 5
     if(ValorFinal.toString().split(".")[1]?.length >5){
         currentNumber = parseFloat(ValorFinal.toFixed(5)).toString();
-    }else{
+    } else{
         currentNumber = ValorFinal.toString(); //senao ele só pega o result normal
     }
          //feito o calculo isso acontece:  isso significa que apos eu clicar em = o próximo num que eu clicar o visor já reinicia
+    currentNumber = currentNumber.replace(".",","); //
     operador = null;
     firstOpe = null;
     restart = true; 
@@ -104,7 +111,7 @@ function calculate(){ //aqui faz o calculo
 function clearCalculator(){
     currentNumber = "";   //numero atual fica vazio
     firstOpe = null;    //tudo vazio
-    operador = null;
+    operador = null;    //operação
     updateResultado (true);  //atualiza pra ficar vazio
 }
 
